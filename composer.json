@@ -1,6 +1,6 @@
 {
     "name": "wildcorsair/debra",
-    "description": "Small ORM",
+    "description": "Small ORM for the small projects",
     "type": "project",
     "license": "MIT",
     "authors": [
@@ -13,7 +13,7 @@
     "require": {},
     "autoload": {
         "psr-4": {
-            "Debra\\": "src/"
+            "Wildcorsair\\Debra\\": "src/"
         }
     }
 }
