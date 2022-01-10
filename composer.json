@@ -1,0 +1,19 @@
+{
+    "name": "wildcorsair/debra",
+    "description": "Small ORM",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Vladimir Zakharchenko",
+            "email": "web.jungle.ua@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Debra\\": "src/"
+        }
+    }
+}
