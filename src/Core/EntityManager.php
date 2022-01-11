@@ -1,5 +1,6 @@
 <?php
-namespace Debra\Core;
+
+namespace FoxTool\Debra\Core;
 
 /**
 * Database connection class
@@ -223,3 +224,4 @@ class EntityManager
 		return implode('', $parts);
 	}
 }
+
