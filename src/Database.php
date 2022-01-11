@@ -1,6 +1,6 @@
 <?php
 
-namespace FoxTool\Debra\Core;
+namespace FoxTool\Debra;
 
 class Database
 {
@@ -10,7 +10,12 @@ class Database
      */
     public function loadConfiguration()
     {
-        $config = $_SERVER['DOCUMENT_ROOT'] . '/config/database.php';
+        if (isset($_SERVER['DOCUMENT_ROOT']) && !empty($_SERVER['DOCUMENT_ROOT'])) {
+            $config = $_SERVER['DOCUMENT_ROOT'] . '/config/database.php';
+        } else {
+            $config = __DIR__ . '/../../../../../config/database.php';
+        }
+
         try {
             if (file_exists($config)) {
                 $this->config = require_once($config);
@@ -30,8 +35,9 @@ class Database
             $this->loadConfiguration();
 
             // Initialize connection with database
-            $dsn = "mysql:host={$this->config['host']};dbname={$this->config['dbname']}";
-            return new \PDO($dsn, $this->config['dbuser'], $this->config['dbpass']);
+            $dsn = "mysql:host={$this->config['host']};dbname={$this->config['database']}";
+
+            return new \PDO($dsn, $this->config['user'], $this->config['password']);
 
         } catch (\PDOException $e) {
             echo '<strong>PDO Error:</strong> ' . $e->getMessage();

@@ -1,6 +1,6 @@
 <?php
 
-namespace FoxTool\Debra\Core;
+namespace FoxTool\Debra;
 
 class Model
 {
