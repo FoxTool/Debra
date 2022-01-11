@@ -13,7 +13,7 @@
     "require": {},
     "autoload": {
         "psr-4": {
-            "Wildcorsair\\Debra\\": "src/"
+            "FoxTool\\Debra\\": "src/"
         }
     }
 }
