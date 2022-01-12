@@ -2,9 +2,11 @@
 
 namespace FoxTool\Debra;
 
+/**
+* Database connection class
+*/
 class Database
 {
-
     /**
      * Load database configuration from file
      */
@@ -13,7 +15,7 @@ class Database
         if (isset($_SERVER['DOCUMENT_ROOT']) && !empty($_SERVER['DOCUMENT_ROOT'])) {
             $config = $_SERVER['DOCUMENT_ROOT'] . '/config/database.php';
         } else {
-            $config = __DIR__ . '/../../../../../config/database.php';
+            $config = __DIR__ . '/../../../../config/database.php';
         }
 
         try {
@@ -44,4 +46,3 @@ class Database
         }
     }
 }
-

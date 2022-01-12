@@ -1,7 +1,8 @@
-# debra
+# Debra
+Simply ORM for the simply projects
 
 ```php
-use FoxTool\Debra\Core\EntityManager;
+use FoxTool\Debra\EntityManager;
 // User class, defined for example in the "app/Entity/User.php" file
 use Debra\Entity\User;
 

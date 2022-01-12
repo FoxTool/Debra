@@ -3,7 +3,7 @@
 namespace FoxTool\Debra;
 
 /**
-* Database connection class
+* Entity Manager class
 */
 class EntityManager
 {
@@ -11,6 +11,7 @@ class EntityManager
 	protected $class;
 	protected $tableName;
 	private $query;
+    private $values = [];
 	public $params;
 
 	public function __construct()
@@ -180,37 +181,51 @@ class EntityManager
 
             $fields = '';
             $placeholders = '';
-            $values = [];
-
 
             if (empty($model->getId())) {
                 foreach ($props as $property) {
-                    $fields .= "`{$property}`,";
+                    $field = $this->convertPropertyName($property);
+                    $fields .= "`{$field}`, ";
                     $placeholders .= ":{$property},";
                     $getter = 'get' . $this->convertFieldName($property);
-                    $values[$property] = $model->$getter($property);
+                    $this->values[$property] = $model->$getter($property);
                 }
 
-                $fields = rtrim($fields, ',');
+                $fields = rtrim($fields, ', ');
                 $placeholders = rtrim($placeholders, ',');
 
                 $this->query = "INSERT INTO `{$this->tableName}` ({$fields}) VALUES ({$placeholders});";
             } else {
                 foreach ($props as $property) {
-                    $fields .= "`{$property}` = :{$property},";
+                    $field = $this->convertPropertyName($property);
+                    $fields .= "`{$field}` = :{$property}, ";
                 	$getter = 'get' . $this->convertFieldName($property);
-                    $values[$property] = $model->$getter($property);
+                    $this->values[$property] = $model->$getter($property);
                 }
 
-                $fields = rtrim($fields, ',');
+                $fields = rtrim($fields, ', ');
                 $this->query = "UPDATE `{$this->tableName}` SET {$fields} WHERE `id` = :id;";
             }
-            $stmt = $this->dbh->prepare($this->query);
-            $stmt->execute($values);
+
+            return $this;
         } catch (\Exception $e) {
             echo '<strong>Error:</strong> ' . $e->getMessage();
         }
 	}
+
+    public function save()
+    {
+        try {
+            if (!empty($this->query)) {
+                $stmt = $this->dbh->prepare($this->query);
+                $stmt->execute($this->values);
+            } else {
+                throw new Exception("The query is empty");
+            }
+        } catch (\Exception $e) {
+            echo '<strong>Error:</strong> ' . $e->getMessage();
+        }
+    }
 
 	private function convertFieldName($field)
 	{
@@ -223,5 +238,22 @@ class EntityManager
 		);
 		return implode('', $parts);
 	}
-}
 
+    private function convertPropertyName($property)
+    {
+        $pos = strcspn($property, implode('', range('A', 'Z')));
+
+        if ($pos < strlen($property)) {
+            do {
+                $first = substr($property, 0,  $pos - strlen($property));
+                $last = substr($property, $pos);
+
+                $last = lcfirst($last);
+                $property = "{$first}_{$last}";
+                $pos = strcspn($property, implode('', range('A', 'Z')));
+            } while ($pos < strlen($property));
+        }
+
+        return $property;
+    }
+}
