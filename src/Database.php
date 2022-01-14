@@ -13,9 +13,9 @@ class Database
     public function loadConfiguration()
     {
         if (isset($_SERVER['DOCUMENT_ROOT']) && !empty($_SERVER['DOCUMENT_ROOT'])) {
-            $config = $_SERVER['DOCUMENT_ROOT'] . '/config/database.php';
+            $config = $_SERVER['DOCUMENT_ROOT'] . '/configs/database.php';
         } else {
-            $config = __DIR__ . '/../../../../config/database.php';
+            $config = __DIR__ . '/../../../../configs/database.php';
         }
 
         try {
@@ -39,7 +39,7 @@ class Database
             // Initialize connection with database
             $dsn = "mysql:host={$this->config['host']};dbname={$this->config['database']}";
 
-            return new \PDO($dsn, $this->config['user'], $this->config['password']);
+            return new \PDO($dsn, $this->config['username'], $this->config['password']);
 
         } catch (\PDOException $e) {
             echo '<strong>PDO Error:</strong> ' . $e->getMessage();
