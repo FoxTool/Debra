@@ -49,9 +49,10 @@ class EntityManager
 					$props = $obj->getProperties();
 
 					foreach ($props as $property) {
-						if (isset($row[$property])) {
+                        $field = $this->convertPropertyName($property);
+						if (isset($row[$field])) {
 							$setter = 'set' . $this->convertFieldName($property);
-							$obj->$setter($row[$property]);
+							$obj->$setter($row[$field]);
 						}
 					}
 
@@ -62,7 +63,6 @@ class EntityManager
 		} catch (\Exception $e) {
 			echo 'Error: ' . $e->getMessage();
 		}
-
 	}
 
     public function find($id)
@@ -79,9 +79,10 @@ class EntityManager
 					$props = $obj->getProperties();
 
 					foreach ($props as $property) {
-						if (isset($row[$property])) {
+                        $field = $this->convertPropertyName($property);
+						if (isset($row[$field])) {
 							$setter = 'set' . $this->convertFieldName($property);
-							$obj->$setter($row[$property]);
+							$obj->$setter($row[$field]);
 						}
 					}
 
@@ -159,9 +160,10 @@ class EntityManager
 			$props = $obj->getProperties();
 
 			foreach ($props as $property) {
-				if (isset($row[$property])) {
+				$field = $this->convertPropertyName($property);
+				if (isset($row[$field])) {
 					$setter = 'set' . $this->convertFieldName($property);
-					$obj->$setter($row[$property]);
+					$obj->$setter($row[$field]);
 				}
 			}
 
