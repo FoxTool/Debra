@@ -39,7 +39,7 @@ class EntityManager
 		$dataset = [];
 
 		try {
-			if (!empty($this->class)) {
+			if (!empty($this->class) && !is_null($this->class)) {
 				$this->query = "SELECT * FROM `{$this->tableName}`";
 				$stmt = $this->dbh->prepare($this->query);
 				$stmt->execute();
@@ -69,7 +69,7 @@ class EntityManager
     {
 		try {
 			if (is_numeric($id)) {
-				if (!empty($this->class)) {
+				if (!empty($this->class) && !is_null($this->class)) {
 					$this->query = "SELECT * FROM `{$this->tableName}` WHERE `id` = :id LIMIT 0, 1";
 					$stmt = $this->dbh->prepare($this->query);
 					$stmt->execute(array('id' => $id));
@@ -89,10 +89,10 @@ class EntityManager
 					return $obj;
 
 				} else {
-					throw new Exception("Empty Model name.", 1);
+					throw new \Exception("Empty Model name", 1);
 				}
 			} else {
-				throw new Exception("ID must be an INTEGER type.", 1);
+				throw new \Exception("ID must be an INTEGER type", 1);
 			}
 		} catch (\Exception $e) {
 			echo '<strong>Error:</strong> ' . $e->getMessage();
@@ -103,10 +103,10 @@ class EntityManager
 	{
 		try {
 			if (empty($conditions) && !is_array($conditions)) {
-				throw new Exception("Conditions are empty.", 100);
+				throw new Exception("Conditions are empty", 100);
 			}
 
-			if (!empty($this->class)) {
+			if (!empty($this->class) && !is_null($this->class)) {
 				$this->query = "SELECT * FROM `{$this->tableName}` WHERE ";
 
 				for ($i = 0; $i < count($conditions); $i++) {
@@ -120,7 +120,7 @@ class EntityManager
 				return $this;
 
 			} else {
-				throw new Exception("Empty Model name.", 1);
+				throw new \Exception("Empty Model name", 1);
 			}
 		} catch (\Exception $e) {
 			echo '<strong>Error:</strong> ' . $e->getMessage();
@@ -222,7 +222,7 @@ class EntityManager
                 $stmt = $this->dbh->prepare($this->query);
                 $stmt->execute($this->values);
             } else {
-                throw new Exception("The query is empty");
+                throw new \Exception("The query is empty");
             }
         } catch (\Exception $e) {
             echo '<strong>Error:</strong> ' . $e->getMessage();
