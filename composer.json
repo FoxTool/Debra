@@ -1,7 +1,7 @@
 {
     "name": "foxtool/debra",
     "description": "Small ORM for the small projects",
-    "type": "project",
+    "type": "library",
     "license": "MIT",
     "authors": [
         {
