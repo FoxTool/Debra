@@ -7,6 +7,8 @@ namespace FoxTool\Debra;
 */
 class Database
 {
+    private array $config;
+
     /**
      * Load database configuration from file
      */
