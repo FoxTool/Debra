@@ -12,7 +12,7 @@ class EntityManager
 	protected $tableName;
 	private $query;
     private $values = [];
-	public $params;
+	private $params;
 
 	public function __construct()
 	{
@@ -23,9 +23,12 @@ class EntityManager
 	public function setModel($class)
 	{
 		if (!empty($class)) {
-		    $this->class = $class;
+			$this->class = $class;
 			$this->tableName = $class::getTableName();
+            $this->params = null;
+			$this->query = "SELECT * FROM `{$this->tableName}`";
 		}
+
 		return $this;
 	}
 
@@ -40,7 +43,6 @@ class EntityManager
 
 		try {
 			if (!empty($this->class) && !is_null($this->class)) {
-				$this->query = "SELECT * FROM `{$this->tableName}`";
 				$stmt = $this->dbh->prepare($this->query);
 				$stmt->execute();
 
@@ -65,12 +67,12 @@ class EntityManager
 		}
 	}
 
-    public function find($id)
-    {
+	public function find($id)
+	{
 		try {
 			if (is_numeric($id)) {
 				if (!empty($this->class) && !is_null($this->class)) {
-					$this->query = "SELECT * FROM `{$this->tableName}` WHERE `id` = :id LIMIT 0, 1";
+					$this->query = " WHERE `id` = :id LIMIT 0, 1";
 					$stmt = $this->dbh->prepare($this->query);
 					$stmt->execute(array('id' => $id));
 
@@ -97,7 +99,7 @@ class EntityManager
 		} catch (\Exception $e) {
 			echo '<strong>Error:</strong> ' . $e->getMessage();
 		}
-    }
+	}
 
 	public function where(Array $conditions)
 	{
@@ -107,7 +109,7 @@ class EntityManager
 			}
 
 			if (!empty($this->class) && !is_null($this->class)) {
-				$this->query = "SELECT * FROM `{$this->tableName}` WHERE ";
+				$this->query .= " WHERE ";
 
 				for ($i = 0; $i < count($conditions); $i++) {
 					if ($i == count($conditions) - 1) {
@@ -149,6 +151,30 @@ class EntityManager
 		return $this;
 	}
 
+	public function limit($limit, $offset = null)
+	{
+		if (empty($limit) ) {
+			throw new \Exception('The "limit" parameter cannot be empty');
+		}
+
+		if (!is_numeric($limit)) {
+			throw new \Exception('The "limit" parameter should be a number');
+		}
+		
+		$this->query .= ' LIMIT ' . $limit;
+
+		if (!is_null($offset)) {
+
+			if (!is_numeric($offset)) {
+				throw new \Exception('The "offset" parameter should be a number');
+			}
+
+			$this->query .= ' OFFSET ' . $offset;
+		}
+
+		return $this;
+	}
+
 	public function get()
 	{
 		$dataSet = [];
@@ -170,6 +196,31 @@ class EntityManager
 			$dataSet[] = $obj;
 		}
 		return $dataSet;
+	}
+
+    /**
+     * Returns all records from a table as associative array
+     * It can use "limit" method before own call
+     * 
+     * @return array
+     */
+	public function json()
+	{
+        $dataSet = [];
+
+        $stmt = $this->dbh->prepare($this->query);
+
+        if (is_array($this->params)) {
+            $stmt->execute($this->params);
+        } else {
+            $stmt->execute();
+        }
+
+        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            $dataSet[] = $row;
+        }
+
+        return $dataSet;
 	}
 
 	public function persist($model)
