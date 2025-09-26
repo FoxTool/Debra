@@ -13,7 +13,7 @@ class Database
     public function loadConfiguration()
     {
         if (isset($_SERVER['DOCUMENT_ROOT']) && !empty($_SERVER['DOCUMENT_ROOT'])) {
-            $config = $_SERVER['DOCUMENT_ROOT'] . '/configs/database.php';
+            $config = $_SERVER['DOCUMENT_ROOT'] . '/../configs/database.php';
         } else {
             $config = __DIR__ . '/../../../../configs/database.php';
         }
