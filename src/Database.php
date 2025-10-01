@@ -17,7 +17,7 @@ class Database
         if (isset($_SERVER['DOCUMENT_ROOT']) && !empty($_SERVER['DOCUMENT_ROOT'])) {
             $config = $_SERVER['DOCUMENT_ROOT'] . '/../configs/database.php';
         } else {
-            $config = __DIR__ . '/../../../../configs/database.php';
+            throw new \Exception('Cannot get "DOCUMENT_ROOT" path');
         }
 
         try {
@@ -28,7 +28,6 @@ class Database
             }
         } catch(\Exception $e) {
             echo '<strong>Error:</strong> ' . $e->getMessage();
-
         }
     }
 

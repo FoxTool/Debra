@@ -16,8 +16,12 @@ class EntityManager
 
 	public function __construct()
 	{
-		$database = new Database();
-		$this->dbh = $database->connect();
+		try {
+            $database = new Database();
+            $this->dbh = $database->connect();
+		} catch(\Exception $e) {
+            echo '<strong>Error:</strong> ' . $e->getMessage();
+		}
 	}
 
 	public function setModel($class)
