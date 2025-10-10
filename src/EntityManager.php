@@ -13,6 +13,7 @@ class EntityManager
 	private $query;
     private $values = [];
 	private $params;
+    private $asField;
 
 	public function __construct()
 	{
@@ -36,10 +37,89 @@ class EntityManager
 		return $this;
 	}
 
-	public function getQuery()
-	{
-		return $this->query;
-	}
+    /**
+     * @param array|string $fields
+     */
+    public function select($fields)
+    {
+        if (empty($fields)) {
+            throw new \Exception('The fields are not provided!');
+        }
+
+        if (gettype($fields) === 'string') {
+            if (str_contains($fields, ',')) {
+                $fields = explode(',', $fields);
+            } else if (str_contains($fields, '*')) {
+                $fieldsList = $fields;
+            } else {
+                throw new \Exception('The fields string is incorrect!');
+            }
+        }
+
+        if (is_array($fields)) {
+            for ($i = 0; $i < count($fields); $i++) {
+                $field = '`' . trim($fields[$i]) . '`';
+                $fields[$i] = $field;
+            }
+
+            $fieldsList = implode(',', $fields);
+        }
+
+
+        $this->query = "SELECT {$fieldsList} FROM `{$this->tableName}`";
+
+        return $this;
+    }
+
+    /**
+     * @param string $resultField
+     */
+    public function count($resultField)
+    {
+        if (empty($resultField)) {
+            throw new \Exception('The result field is not provided!');
+        }
+
+        $this->asField = $resultField;
+        $this->query = "SELECT COUNT(*) as `{$this->asField}` FROM `{$this->tableName}` LIMIT 0 ,1;";
+
+        return $this;
+    }
+
+    /**
+     * @param string $sourceField
+     * @param string $resultField
+     */
+    public function sum($sourceField, $resultField)
+    {
+        if (empty($sourceField)) {
+            throw new \Exception('The source field is not provided!');
+        }
+
+        if (empty($resultField)) {
+            throw new \Exception('The result field is not provided!');
+        }
+
+        $this->asField = $resultField;
+        $this->query = "SELECT SUM({$sourceField}) as `{$this->asField}` FROM `{$this->tableName}` LIMIT 0 ,1;";
+
+        return $this;
+    }
+
+    public function calculate()
+    {
+        if (!empty($this->class) && !is_null($this->class)) {
+            $stmt = $this->dbh->prepare($this->query);
+            $stmt->execute();
+
+            while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+                $obj = new \stdClass;
+                $obj->{$this->asField} = $row[$this->asField];
+            }
+
+            return $obj;
+        }
+    }
 
 	public function all()
 	{
@@ -76,7 +156,7 @@ class EntityManager
 		try {
 			if (is_numeric($id)) {
 				if (!empty($this->class) && !is_null($this->class)) {
-					$this->query = " WHERE `id` = :id LIMIT 0, 1";
+					$this->query .= " WHERE `id` = :id LIMIT 0, 1";
 					$stmt = $this->dbh->prepare($this->query);
 					$stmt->execute(array('id' => $id));
 
@@ -164,7 +244,7 @@ class EntityManager
 		if (!is_numeric($limit)) {
 			throw new \Exception('The "limit" parameter should be a number');
 		}
-		
+
 		$this->query .= ' LIMIT ' . $limit;
 
 		if (!is_null($offset)) {
@@ -205,7 +285,7 @@ class EntityManager
     /**
      * Returns all records from a table as associative array
      * It can use "limit" method before own call
-     * 
+     *
      * @return array
      */
 	public function json()
@@ -284,17 +364,22 @@ class EntityManager
         }
     }
 
-	private function convertFieldName($field)
-	{
-		$parts = explode('_', $field);
-		$parts = array_map(
-			function($field) {
-				return ucfirst($field);
-			},
-			$parts
-		);
-		return implode('', $parts);
-	}
+    public function getQuery()
+    {
+        return $this->query;
+    }
+
+    private function convertFieldName($field)
+    {
+        $parts = explode('_', $field);
+        $parts = array_map(
+            function($field) {
+                return ucfirst($field);
+            },
+            $parts
+        );
+        return implode('', $parts);
+    }
 
     private function convertPropertyName($property)
     {
