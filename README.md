@@ -106,3 +106,47 @@ $user->setUpdatedAt(date("Y-m-d H:i:s"));
 $em->persist($user);
 $em->save();
 ```
+
+## _SELECT by fields list_
+
+```php
+// All fields (*)
+$user = $this->em
+    ->setModel(User::class)
+    ->select('*')
+    ->find($id);
+
+// Fields defined as array
+$user = $this->em
+    ->setModel(User::class)
+    ->select(['id', 'first_name', 'last_name'])
+    ->find($id);
+
+// Fields defined as string
+$user = $this->em
+    ->setModel(User::class)
+    ->select('id, first_name, last_name, email')
+    ->find($id);
+```
+
+## _COUNT and SUM_
+
+```php
+// COUNT
+$products = $this->em
+    ->setModel(Product::class)
+    ->count('total') // Result field name
+    ->calculate();
+
+// Can get value from the property which was sent as parameter in the "count" function
+$products->total;
+
+// SUM
+$user = $this->em
+    ->setModel(User::class)
+    ->sum('id', 'total') // First is source field, second is result field
+    ->calculate();
+
+// Can get value from the property which was sent as second parameter in the "sum" function
+$products->total;
+```
