@@ -81,7 +81,7 @@ class EntityManager
         }
 
         $this->asField = $resultField;
-        $this->query = "SELECT COUNT(*) as `{$this->asField}` FROM `{$this->tableName}` LIMIT 0 ,1;";
+        $this->query = "SELECT COUNT(*) as `{$this->asField}` FROM `{$this->tableName}`";
 
         return $this;
     }
@@ -101,7 +101,7 @@ class EntityManager
         }
 
         $this->asField = $resultField;
-        $this->query = "SELECT SUM({$sourceField}) as `{$this->asField}` FROM `{$this->tableName}` LIMIT 0 ,1;";
+        $this->query = "SELECT SUM({$sourceField}) as `{$this->asField}` FROM `{$this->tableName}`";
 
         return $this;
     }
@@ -109,8 +109,16 @@ class EntityManager
     public function calculate()
     {
         if (!empty($this->class) && !is_null($this->class)) {
+            if (!str_contains($this->query, 'LIMIT')) {
+                $this->query = $this->query . ' LIMIT 0, 1;';
+            }
+
             $stmt = $this->dbh->prepare($this->query);
-            $stmt->execute();
+            if (is_array($this->params)) {
+                $stmt->execute($this->params);
+            } else {
+                $stmt->execute();
+            }
 
             while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
                 $obj = new \stdClass;
@@ -156,7 +164,7 @@ class EntityManager
 		try {
 			if (is_numeric($id)) {
 				if (!empty($this->class) && !is_null($this->class)) {
-					$this->query .= " WHERE `id` = :id LIMIT 0, 1";
+					$this->query .= " WHERE `id` = :id LIMIT 0, 1;";
 					$stmt = $this->dbh->prepare($this->query);
 					$stmt->execute(array('id' => $id));
 
@@ -253,7 +261,7 @@ class EntityManager
 				throw new \Exception('The "offset" parameter should be a number');
 			}
 
-			$this->query .= ' OFFSET ' . $offset;
+			$this->query .= ' OFFSET ' . $offset . ';';
 		}
 
 		return $this;
